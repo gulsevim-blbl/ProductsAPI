@@ -3,17 +3,20 @@ using Microsoft.AspNetCore.Mvc;
 using ProductsAPI.DTO;
 using ProductsAPI.Models;
 
+
 namespace ProductsAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     public class UsersController: ControllerBase //API Controller oluğu için ControllerBase'ten kalıtım alır.
     {
-        private UserManager<AppUser> _userManager;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly SignInManager<AppUser> _singInManager;
 
-        public UsersController(UserManager<AppUser> userManager)
+        public UsersController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
         {
             _userManager = userManager;
+            _singInManager = signInManager;
         }
 
         [HttpPost("register")]
@@ -38,8 +41,28 @@ namespace ProductsAPI.Controllers
             {
                 return StatusCode(201);
             }
-            return BadRequest(result.Errors);
+            return
+            BadRequest(result.Errors);
+        }
 
+        public async Task<IActionResult> Login(LoginDTO model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
+            if(user == null)
+            {
+                return BadRequest(new { message = "email hatalı" });
+            }
+
+            var result = await _singInManager.CheckPasswordSignInAsync(user, model.Password,false);
+
+            if(result.Succeeded)
+            {
+                return Ok(
+                    new { token = "token" }
+                );
+            }
+            return Unauthorized();
         }
     }
 
