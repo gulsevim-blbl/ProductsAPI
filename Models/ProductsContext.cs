@@ -1,13 +1,14 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace ProductsAPI.Models
 {
-    public class ProductsContext:DbContext
-    {
+    public class ProductsContext:IdentityDbContext<AppUser, AppRole, int>
+    {  
         public ProductsContext(DbContextOptions<ProductsContext> options): base(options)
         {
         }
-        // Seed Data
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
