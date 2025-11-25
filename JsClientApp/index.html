@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+</head>
+<body>
+    <button onclick="getProducts()">Get Products</button>
+    <button onclick="getProductsById()">Get Product</button>
+     <button onclick="login()">Login</button>
+
+    <div id="divProducts"></div>
+
+    <script>
+
+        const login = async () =>{
+            const response = await fetch("http://localhost:5065/api/users/login", {
+                method: "POST",
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: "info@gulsevimblbl.com",
+                    password: "gulsevim12345"
+                })
+                
+            });
+
+            const result = await response.json();
+            // console.log(result);
+            localStorage.setItem("token", JSON.stringify(result.token));
+
+        }
+
+        const getProducts = async () => {
+            const response = await fetch("http://localhost:5065/api/products");
+            const products = await response.json();  
+
+            displayProducts(products);
+        };
+
+        const getProductsById = async () => {
+            const token = JSON.parse(localStorage.getItem("token"));
+            const response = await fetch("http://localhost:5065/api/products/2", {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const product = await response.json();  
+
+            displayProduct(product);
+        };
+
+        const displayProduct = (product) => {
+            const parent = document.getElementById("divProducts");
+            parent.innerHTML = ""; // eski veriyi temizlemek istersen
+
+           
+                parent.innerHTML = `
+                    <div>
+                        <h5>${product.productName}</h5>
+                        <p>${product.price}</p>
+                    </div>
+                `;
+           
+        };
+
+        const displayProducts = (products) => {
+            const parent = document.getElementById("divProducts");
+            parent.innerHTML = ""; // eski veriyi temizlemek istersen
+
+            products.forEach(prd => {
+                parent.innerHTML += `
+                    <div>
+                        <h5>${prd.productName}</h5>
+                        <p>${prd.price}</p>
+                    </div>
+                `;
+            });
+        };
+    </script>
+</body>
+</html>
