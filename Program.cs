@@ -6,7 +6,18 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ProductsAPI.Models;
 
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(options =>{
+    options.AddPolicy(MyAllowSpecificOrigins, 
+    policy => {
+            policy.WithOrigins("http://127.0.0.1:5500")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 
 builder.Services.AddDbContext<ProductsContext>(x => x.UseSqlite("Data Source=products.db"));
 builder.Services.AddIdentity<AppUser, AppRole>().AddEntityFrameworkStores<ProductsContext>();
@@ -33,7 +44,7 @@ builder.Services.AddAuthentication(x => {
     x.TokenValidationParameters = new TokenValidationParameters 
     {
         ValidateIssuer = false,
-        ValidIssuer = "sadikturan.com",
+        ValidIssuer = "gulsevimbulbul.com",
         ValidateAudience = false,
         ValidAudience = "",
         ValidAudiences = new string[] { "a","b"},
@@ -86,8 +97,30 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
+app.UseRouting();
+
+app.UseCors(MyAllowSpecificOrigins);
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
+
+
+/*
+Peki bunu nerde tanımlayacağız?
+
+Aşağıya doğru gidelim buradan Authorization'ın hemen üstüne gelecek.
+
+Authorization üstünde olması gerekiyor.
+
+Eğer routing varsa routing in arasında olacak yani.
+
+Gelip burada app.routing de ekleyelim.
+
+Burda routing routing altına gelerek de app.useCors diyelim içerisine de buradan MyAllowSpecificOrigin diyelim.
+
+Bu şekilde yani static dosya tanımlamanız varsa da static dosyalardan önce tanımlanması gerekiyor.
+
+Bu sıralamalar önemli.
+*/
