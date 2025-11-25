@@ -13,7 +13,7 @@ namespace ProductsAPI.Controllers
     [ApiController]
     [Route("api/[controller]")]
     public class UsersController: ControllerBase //API Controller oluğu için ControllerBase'ten kalıtım alır.
-     {
+    {
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _singInManager;
         private readonly IConfiguration _configuration;
@@ -85,7 +85,8 @@ namespace ProductsAPI.Controllers
                     }
                 ),
                 Expires = DateTime.UtcNow.AddDays(1),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+                Issuer = "sadikturan.com"
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
